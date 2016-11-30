@@ -6,8 +6,13 @@
 </head>
 <body>
 
-<input name="accelerationSlider" id="accelerationSlider" type="range" min="0" max="1000" step="1" onchange="setAcceleration()" /> 
-<label for="accelerationSlider" id="lblAccelerationSlider"></label>
+<!--input name="accelerationSlider" id="accelerationSlider" type="range" min="0" max="1000" step="1" onchange="setAcceleration()" /> 
+<label for="accelerationSlider" id="lblAccelerationSlider"></label-->
+
+<div id="scoreBoard">
+	<div id="scoreBoardLeft">0</div>
+	<div id="scoreBoardRight">0</div>
+</div>
 
 <div id="mainContainer" class="mainContainer ratio1-1">
 	<div id="innerContainer" class="innerContainer">
@@ -33,27 +38,28 @@
 
 <style type="text/css">
 .mainContainer {
-	background: #c0a489;
+	background: #254345;
 	position: absolute;
 	display: inline-block;
 	vertical-align: top;
-    box-shadow: 0 0 4px rgba(0,0,0,.3);
+    box-shadow: 6px 6px 9px -1px rgba(0,0,0,0.6);
+    border-radius: 3.75%;
 }
 
 .tar {
 	width: 10%;
 	border-radius: 20%;
-    background: #C60000;
+    background: #04A2AE;
     position: absolute;
     display: inline-block;
     vertical-align: top;
-    box-shadow: 0 0 4px rgba(0,0,0,.3);
+    box-shadow: 0px 0px 18px 7px rgba(0,0,0,0.1);
 }
 
 .aux {
     width: 5%;
     border-radius: 50%;
-    background: #F9D237;
+    background: #37DCE7;
     position: absolute;
     display: inline-block;
     vertical-align: top;
@@ -86,6 +92,47 @@
 	height: 100%;
 	width: 100%;
 	transform-origin: center center;
+}
+
+#scoreBoard{
+	text-align: center;
+	height: 3em;
+	width: 8em;
+	background-color: #254345;
+	float: left;
+	margin-top: 1%;
+	margin-left: 1%;
+	position: relative;
+	border-radius: 10%;
+	box-shadow: 0 0 4px rgba(0,0,0,.3);
+}
+
+#scoreBoardLeft{
+	height: 80%;
+	width: 45%;
+	top: 10%;
+	position: absolute;
+	background-color: #58B600;
+	color: #c0f2c0;
+	border-radius: 10%;
+	float: left;
+	left: 2.5%;
+	font-size: 2em;
+	line-height: 1.25em;
+}
+
+#scoreBoardRight{
+	height: 80%;
+	display: inline-block;
+	width: 45%;
+	top: 10%;
+	position: absolute;
+	background-color: #8F1D1D;
+	color: #E1A3A3;
+	border-radius: 10%;
+	margin-left: 2.5%;
+	font-size: 2em;
+	line-height: 1.25em;
 }
 
 </style>
@@ -171,7 +218,8 @@
 			pointCounter++;
 		}
 		tryCounter++;
-		$("#scoreDisplay").html(pointCounter + " - " + tryCounter);
+		$("#scoreBoardLeft").html(pointCounter);
+		$("#scoreBoardRight").html(tryCounter - pointCounter);
 	}
 
 	setInterval(function()
@@ -223,7 +271,7 @@
 			case 1:
 				target.css("top", "0%");
     			target.css("left", "50%");
-    			target.css("background", "#6537F9");
+    			target.css("background", "#73D11B");
 				break;
 			case 2:
 				target.css("top", "50%");
