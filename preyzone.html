@@ -6,13 +6,13 @@
 </head>
 <body>
 
-<input name="accelerationSlider" id="accelerationSlider" type="range" min="0" max="1000" step="1" onchange="refreshAcceleration()" /> 
+<input name="accelerationSlider" id="accelerationSlider" type="range" min="0" max="1000" step="1" onchange="setAcceleration()" /> 
 <label for="accelerationSlider" id="lblAccelerationSlider"></label>
 
 <div id="mainContainer" class="mainContainer ratio1-1">
 	<div id="innerContainer" class="innerContainer">
 		<div id="target" class="ratio1-1 tar">
-			<div class="filler"></div>
+			<div class="filler" id="scoreDisplay"></div>
 		</div>
 		<div id="auxContainer">
 			<div id="aux_1" class="ratio1-1 aux" >
@@ -91,9 +91,13 @@
 </style>
 
 <script type="text/javascript">
-	var rotationSpeed = 5; //RPM with acceleration set to false
-	var refreshSpeed = 100//RfrPS
+	var rotationSpeed = 15; //RPM with acceleration set to false
+	var refreshSpeed = 35//RfrPS
 	var accelerationPr = 100; //% per Revolution
+	var debug = false; //may cause animation go slow
+	var angleRaw = 0;
+	var pointCounter = 0;
+	var tryCounter = 0;
 
 	rotationSpeed = ((rotationSpeed / 60) * 360); //degs per sec
 	acceleration = accelerationPr / 100; //coeficiente
@@ -107,7 +111,16 @@
 			spawnSquares();
 		});
 
-	function refreshAcceleration()
+	$('body').keydown(function(e)
+	{
+		if(e.keyCode == 32)
+		{
+			e.preventDefault(); //stops browser from scrolling
+			validateFire();
+		}
+	});
+
+	function setAcceleration()
 	{
 		var acc = $("#accelerationSlider").val();
 		$("#lblAccelerationSlider").text(acc + "%");
@@ -133,31 +146,48 @@
 		}
 	}
 
-	var angleRaw = 0;
+	function validateFire()
+	{
+		if(((angleRaw % 90) < 10) || ((angleRaw % 90) > 80))
+		{
+			pointCounter++;
+		}
+		tryCounter++;
+		$("#scoreDisplay").html(pointCounter + " - " + tryCounter);
+	}
 
 	setInterval(function()
 	{
-		phaseFactor = (((((angleRaw * 100) / 720) / 100)) + 1);
-		if(acceleration != 0) { phaseFactor = phaseFactor * (acceleration + 1); }
+		var initialAngle = angleRaw;
+		if(debug == true) { console.log("inAn " + initialAngle); }
+		phaseFactor = ((((initialAngle * 100) / 360) / 100)); //need +1 to realy be a factor
+		triangularPhaseFactor  = (angleRaw < 180) ? (phaseFactor * 2) : (1 - phaseFactor ); //same as phaseFactor
+		if(debug == true) { console.log("tpf " + triangularPhaseFactor); }
+		if(debug == true) { console.log("pf " + phaseFactor); }
+		//if(acceleration != 0) { phaseFactor = phaseFactor * (acceleration + 1); }
 
-		if(angleRaw < 360)
-		{
-			angleRaw = (angleRaw + ((rotationSpeed / refreshSpeed) * phaseFactor));
-			angleRaw = (angleRaw * (1 + phaseFactor));
-		}
-		else
-		{
-			angleRaw = ((angleRaw + (rotationSpeed / refreshSpeed)));
-			angleRaw = (angleRaw * (1 - phaseFactor));
-		}
+		nativeIncreaseRatio = (rotationSpeed / refreshSpeed);
+		triangularIncreaseRatio = nativeIncreaseRatio * (1 + triangularPhaseFactor);
+		//angleRaw = (angleRaw * (1 + phaseFactor));
+		if(debug == true) { console.log("na " + nativeIncreaseRatio); }
+	
 
-		angleRaw = angleRaw % 720;
+		angleRaw = ((initialAngle + triangularIncreaseRatio) % 360);
+		if(debug == true) { console.log("fAraw " + angleRaw); }
     	var angle = parseInt(angleRaw);
-	    $("#auxContainer")
+    	if(debug == true) { console.log("angle " + angle); }
+	    setRotationPosition(angle);
+
+	},
+	(1000 / refreshSpeed));
+
+	function setRotationPosition(angle)
+	{
+		$("#auxContainer")
 		    .css('-webkit-transform', 'rotate('+angle+'deg)')
 	        .css('-moz-transform', 'rotate('+angle+'deg)')
 	        .css('-ms-transform', 'rotate('+angle+'deg)');
-	}, (1000 / refreshSpeed));
+	}
 
 	function setTarget()
 	{
