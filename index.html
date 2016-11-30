@@ -245,6 +245,7 @@ body {
 			last = true;
 			updateColor("#aux_1", last);
 			axis = ((pointCounter % 2) == 0) ? "x" : "y";
+			axis = ((pointCounter % 3) == 0) ? "both" : axis;
 			toggleAux(axis);
 		}
 		else
