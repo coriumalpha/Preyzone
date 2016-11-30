@@ -173,12 +173,24 @@ body {
 			fontSize();
 		});
 
+	var newFireAllowed = true;
 	$('body').keydown(function(e)
 	{
 		if(e.keyCode == 32)
 		{
 			e.preventDefault(); //stops browser from scrolling
-			validateFire();
+			if(newFireAllowed)
+			{
+				validateFire();
+				newFireAllowed = false;
+			}
+		}
+	});
+	$('body').keyup(function(e)
+	{
+		if(e.keyCode == 32)
+		{
+			newFireAllowed = true;
 		}
 	});
 
@@ -190,13 +202,6 @@ body {
 	    $("#scoreBoardLeft").css('font-size', fontSize);
 	    $("#scoreBoardRight").css('font-size', fontSize);
 	    $("#initialTip").css('font-size', (fontSize * 0.35));
-	}
-
-	function setAcceleration()
-	{
-		var acc = $("#accelerationSlider").val();
-		$("#lblAccelerationSlider").text(acc + "%");
-		acceleration = acc / 100;
 	}
 
 	function spawnSquares()
