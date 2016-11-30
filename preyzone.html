@@ -3,22 +3,21 @@
 <head>
 	<title>Preyzone</title>
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+	<script
+		src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+		integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+		crossorigin="anonymous">
+	</script>
 </head>
 <body>
 
-<!--input name="accelerationSlider" id="accelerationSlider" type="range" min="0" max="1000" step="1" onchange="setAcceleration()" /> 
-<label for="accelerationSlider" id="lblAccelerationSlider"></label-->
-
-<div id="scoreBoard">
-	<div id="scoreBoardLeft">0</div>
-	<div id="scoreBoardRight">0</div>
-</div>
-
 <div id="mainContainer" class="mainContainer ratio1-1">
 	<div id="innerContainer" class="innerContainer">
-		<div id="target" class="ratio1-1 tar">
-			<div class="filler" id="scoreDisplay"></div>
+		<div id="scoreBoard">
+			<div id="scoreBoardLeft">0</div>
+			<div id="scoreBoardRight">0</div>
 		</div>
+
 		<div id="auxContainer">
 			<div id="aux_1" class="ratio1-1 aux" >
 				<div class="filler"></div>
@@ -98,16 +97,17 @@
 
 #scoreBoard{
 	text-align: center;
-	height: 3em;
-	width: 6%;
+	height: 15%;
+	width: 40%;
 	background-color: #254345;
-	left: 47%;
-	margin-top: 1%;
-	margin-bottom: 1%;
-	position: relative;
+	left: 30%;
+	position: absolute;
 	border-radius: 10%;
 	box-shadow: 0 0 4px rgba(0,0,0,.3);
 	transform-origin: center center;
+	top: 42.5%;
+	cursor: pointer;
+	z-index: 1;
 }
 
 #scoreBoardLeft{
@@ -155,10 +155,12 @@
 	$(function()
 		{
 			spawnSquares();
+			fontSize();
 		});
 	$(window).resize(function()
 		{
 			spawnSquares();
+			fontSize();
 		});
 
 	$('body').keydown(function(e)
@@ -170,7 +172,14 @@
 		}
 	});
 
-	$("#target").click(function(){ validateFire(); });
+	$("#scoreBoard").click(function(){ validateFire(); });
+
+	function fontSize()
+	{
+	    var fontSize = $("#scoreBoardLeft").height() * 0.85; // 10% of container width
+	    $("#scoreBoardLeft").css('font-size', fontSize);
+	    $("#scoreBoardRight").css('font-size', fontSize);
+	}
 
 	function setAcceleration()
 	{
@@ -218,11 +227,15 @@
 
 	function validateFire()
 	{
-		if(((angleRaw % 90) < 10) || ((angleRaw % 90) > 80))
+		if(((angleRaw % 90) < 15) || ((angleRaw % 90) > 75))
 		{
 			pointCounter++;
 			axis = ((pointCounter % 2) == 0) ? "x" : "y";
 			toggleAux(axis);
+		}
+		else
+		{
+			$("#scoreBoard").effect("shake", "", 100);
 		}
 		tryCounter++;
 		$("#scoreBoardLeft").html(pointCounter);
