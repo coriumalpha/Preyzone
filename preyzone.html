@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Preyzone</title>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+
+<input name="accelerationSlider" id="accelerationSlider" type="range" min="0" max="1000" step="1" onchange="refreshAcceleration()" /> 
+<label for="accelerationSlider" id="lblAccelerationSlider"></label>
+
+<div id="mainContainer" class="mainContainer ratio1-1">
+	<div id="innerContainer" class="innerContainer">
+		<div id="target" class="ratio1-1 tar">
+			<div class="filler"></div>
+		</div>
+		<div id="auxContainer">
+			<div id="aux_1" class="ratio1-1 aux" >
+				<div class="filler"></div>
+			</div>
+			<div id="aux_2" class="ratio1-1 aux" >
+				<div class="filler"></div>
+			</div>
+			<div id="aux_3" class="ratio1-1 aux" >
+				<div class="filler"></div>
+			</div>
+			<div id="aux_4" class="ratio1-1 aux" >
+				<div class="filler"></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style type="text/css">
+.mainContainer {
+	background: #c0a489;
+	position: absolute;
+	display: inline-block;
+	vertical-align: top;
+    box-shadow: 0 0 4px rgba(0,0,0,.3);
+}
+
+.tar {
+	width: 10%;
+	border-radius: 20%;
+    background: #C60000;
+    position: absolute;
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: 0 0 4px rgba(0,0,0,.3);
+}
+
+.aux {
+    width: 5%;
+    border-radius: 50%;
+    background: #F9D237;
+    position: absolute;
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: 0 0 4px rgba(0,0,0,.3);
+}
+
+
+.aux:before, .tar:before, #mainContainer:before{
+    content: '';
+    display: block;
+}
+.ratio1-1:before {padding-top: 100%;}
+
+.filler {    
+   position: absolute;
+   top: 0; left: 0; bottom: 0; right: 0;
+   font-size: 1.5rem;
+   color: #444;
+}
+
+.innerContainer{
+	margin: 2.5%;
+	position: absolute;
+   	top: 0; left: 0; bottom: 0; right: 0;
+   	font-size: 1.5rem;
+   	color: #444;
+}
+
+#auxContainer{
+	height: 100%;
+	width: 100%;
+	transform-origin: center center;
+}
+
+</style>
+
+<script type="text/javascript">
+	var rotationSpeed = 5; //RPM with acceleration set to false
+	var refreshSpeed = 100//RfrPS
+	var accelerationPr = 100; //% per Revolution
+
+	rotationSpeed = ((rotationSpeed / 60) * 360); //degs per sec
+	acceleration = accelerationPr / 100; //coeficiente
+
+	$(function()
+		{
+			spawnSquares();
+		});
+	$(window).resize(function()
+		{
+			spawnSquares();
+		});
+
+	function refreshAcceleration()
+	{
+		var acc = $("#accelerationSlider").val();
+		$("#lblAccelerationSlider").text(acc + "%");
+		acceleration = acc / 100;
+	}
+
+	function spawnSquares()
+	{
+		setTarget();
+		var vh = $(window).height();
+		var vw = $(window).width();
+		var dynamicPercent = 10;
+		var resultW = parseInt(vh - (vh * (dynamicPercent / 100)));
+		var resultL = parseInt(vw - (vw / 2) - (resultW / 2));
+		var resultMT = parseInt(vh * 0.01);
+		$("#mainContainer").css("width", resultW + "px");
+		$("#mainContainer").css("left", resultL + "px");
+		$("#mainContainer").css("margin-top", resultMT + "px");
+
+		for(i = 0; i < 4; i++)
+		{
+			setAux(i + 1);
+		}
+	}
+
+	var angleRaw = 0;
+
+	setInterval(function()
+	{
+		phaseFactor = (((((angleRaw * 100) / 720) / 100)) + 1);
+		if(acceleration != 0) { phaseFactor = phaseFactor * (acceleration + 1); }
+
+		if(angleRaw < 360)
+		{
+			angleRaw = (angleRaw + ((rotationSpeed / refreshSpeed) * phaseFactor));
+			angleRaw = (angleRaw * (1 + phaseFactor));
+		}
+		else
+		{
+			angleRaw = ((angleRaw + (rotationSpeed / refreshSpeed)));
+			angleRaw = (angleRaw * (1 - phaseFactor));
+		}
+
+		angleRaw = angleRaw % 720;
+    	var angle = parseInt(angleRaw);
+	    $("#auxContainer")
+		    .css('-webkit-transform', 'rotate('+angle+'deg)')
+	        .css('-moz-transform', 'rotate('+angle+'deg)')
+	        .css('-ms-transform', 'rotate('+angle+'deg)');
+	}, (1000 / refreshSpeed));
+
+	function setTarget()
+	{
+		var target = $("#target");
+		target.css("top", "45%");
+    	target.css("left", "45%");
+	}
+
+	function setAux(aux)
+	{
+		var target = $("#aux_" + aux);
+		target.css("transform-origin", "center center");
+		switch(aux)
+		{
+			case 1:
+				target.css("top", "0%");
+    			target.css("left", "50%");
+    			target.css("background", "#6537F9");
+				break;
+			case 2:
+				target.css("top", "50%");
+    			target.css("left", "95%");
+				break;
+	    	case 3:
+				target.css("top", "95%");
+    			target.css("left", "50%");
+				break;
+	    	case 4:
+				target.css("top", "50%");
+    			target.css("left", "0%");
+				break;
+
+		}
+	}
+
+
+</script>
+
+</body>
+</html>
