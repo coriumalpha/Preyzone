@@ -16,6 +16,7 @@
 		<div id="scoreBoard">
 			<div id="scoreBoardLeft">0</div>
 			<div id="scoreBoardRight">0</div>
+			<div id="initialTip">Press spacebar or Click scoreboard</div>
 		</div>
 
 		<div id="auxContainer">
@@ -36,6 +37,11 @@
 </div>
 
 <style type="text/css">
+
+body {
+	background-color: #041A1B;
+}
+
 .mainContainer {
 	background: #254345;
 	position: absolute;
@@ -138,6 +144,10 @@
 	line-height: 1.25em;
 }
 
+#initialTip{
+	margin-top: 45%;
+	color: #60979B;
+}
 </style>
 
 <script type="text/javascript">
@@ -179,6 +189,7 @@
 	    var fontSize = $("#scoreBoardLeft").height() * 0.85; // 10% of container width
 	    $("#scoreBoardLeft").css('font-size', fontSize);
 	    $("#scoreBoardRight").css('font-size', fontSize);
+	    $("#initialTip").css('font-size', (fontSize * 0.35));
 	}
 
 	function setAcceleration()
@@ -203,7 +214,7 @@
 		
 		var resultW_vertical = parseInt(vw - (vw * (dynamicPercent / 100)));
 		var resultL_vertical = parseInt(vw - (vw / 2) - (resultW_vertical / 2));
-		var resultMT_vertical = parseInt(vw * 0.01);
+		var resultMT_vertical = parseInt(vw * 0.02);
 		
 		//Vertical orientation support for Cordova/Phonegap porting
 		if(vw > vh)
@@ -225,19 +236,28 @@
 		}
 	}
 
+	var last = true;
 	function validateFire()
 	{
 		if(((angleRaw % 90) < 15) || ((angleRaw % 90) > 75))
 		{
 			pointCounter++;
+			last = true;
+			updateColor("#aux_1", last);
 			axis = ((pointCounter % 2) == 0) ? "x" : "y";
 			toggleAux(axis);
 		}
 		else
 		{
+			last = false;
+			updateColor("#aux_1", last);
 			$("#scoreBoard").effect("shake", "", 100);
 		}
 		tryCounter++;
+		if(tryCounter == 1)
+		{
+			$("#initialTip").effect("fold", "", 350).hide("swing");
+		}
 		$("#scoreBoardLeft").html(pointCounter);
 		$("#scoreBoardRight").html(tryCounter - pointCounter);
 	}
@@ -277,17 +297,17 @@
 
 	function setTarget()
 	{
-		var target = $("#target");
-		target.css("top", "45%");
-    	target.css("left", "45%");
+		var target = $("#scoreBoard");
+		target.css("top", "42.5%");
+    	target.css("left", "30%");
 	}
 
 	function setAux(aux)
 	{
 		var target = $("#aux_" + aux);
 		target.css("transform-origin", "center center");
-		target.css("transition-property", "top, left");
-    	target.css("transition-duration", "0.25s, 0.25s");
+		target.css("transition-property", "top, left, background");
+    	target.css("transition-duration", "0.25s, 0.25s, 0.25s");
 		switch(aux)
 		{
 			case 1:
@@ -308,6 +328,18 @@
     			target.css("left", "0%");
 				break;
 
+		}
+	}
+
+	function updateColor(el, last)
+	{
+		if(last)
+		{
+			$(el).css("background", "#73D11B");
+		}
+		else
+		{
+			$(el).css("background", "#8F1D1D");
 		}
 	}
 
