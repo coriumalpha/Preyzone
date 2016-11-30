@@ -130,15 +130,33 @@
 	function spawnSquares()
 	{
 		setTarget();
+		
 		var vh = $(window).height();
 		var vw = $(window).width();
+		
 		var dynamicPercent = 10;
+		
 		var resultW = parseInt(vh - (vh * (dynamicPercent / 100)));
 		var resultL = parseInt(vw - (vw / 2) - (resultW / 2));
 		var resultMT = parseInt(vh * 0.01);
-		$("#mainContainer").css("width", resultW + "px");
-		$("#mainContainer").css("left", resultL + "px");
-		$("#mainContainer").css("margin-top", resultMT + "px");
+		
+		var resultW_vertical = parseInt(vw - (vw * (dynamicPercent / 100)));
+		var resultL_vertical = parseInt(vw - (vw / 2) - (resultW_vertical / 2));
+		var resultMT_vertical = parseInt(vw * 0.01);
+		
+		//Vertical orientation support for Cordova/Phonegap porting
+		if(vw > vh)
+		{
+			$("#mainContainer").css("width", resultW + "px");
+			$("#mainContainer").css("left", resultL + "px");
+			$("#mainContainer").css("margin-top", resultMT + "px");
+		}
+		else
+		{
+			$("#mainContainer").css("width", resultW_vertical + "px");
+			$("#mainContainer").css("left", resultL_vertical + "px");
+			$("#mainContainer").css("margin-top", resultMT_vertical + "px");
+		}
 
 		for(i = 0; i < 4; i++)
 		{
