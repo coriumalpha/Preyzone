@@ -216,6 +216,7 @@
 		if(((angleRaw % 90) < 10) || ((angleRaw % 90) > 80))
 		{
 			pointCounter++;
+			toggleAux();
 		}
 		tryCounter++;
 		$("#scoreBoardLeft").html(pointCounter);
@@ -266,6 +267,8 @@
 	{
 		var target = $("#aux_" + aux);
 		target.css("transform-origin", "center center");
+		target.css("transition-property", "top");
+    	target.css("transition-duration", "0.3s");
 		switch(aux)
 		{
 			case 1:
@@ -286,6 +289,23 @@
     			target.css("left", "0%");
 				break;
 
+		}
+	}
+
+	var yToggleStatus = false;
+	function toggleAux()
+	{
+		if(yToggleStatus)
+		{
+			$("#aux_1").css("top", "5%");
+			$("#aux_3").css("top", "95%");
+			yToggleStatus = false;
+		}
+		else
+		{
+			$("#aux_1").css("top", "95%");
+			$("#aux_3").css("top", "5%");
+			yToggleStatus = true;
 		}
 	}
 
