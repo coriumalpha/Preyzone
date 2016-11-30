@@ -54,6 +54,8 @@
     display: inline-block;
     vertical-align: top;
     box-shadow: 0px 0px 18px 7px rgba(0,0,0,0.1);
+    z-index: 1;
+	cursor: pointer;
 }
 
 .aux {
@@ -97,14 +99,15 @@
 #scoreBoard{
 	text-align: center;
 	height: 3em;
-	width: 8em;
+	width: 6%;
 	background-color: #254345;
-	float: left;
+	left: 47%;
 	margin-top: 1%;
-	margin-left: 1%;
+	margin-bottom: 1%;
 	position: relative;
 	border-radius: 10%;
 	box-shadow: 0 0 4px rgba(0,0,0,.3);
+	transform-origin: center center;
 }
 
 #scoreBoardLeft{
@@ -167,6 +170,8 @@
 		}
 	});
 
+	$("#target").click(function(){ validateFire(); });
+
 	function setAcceleration()
 	{
 		var acc = $("#accelerationSlider").val();
@@ -181,7 +186,7 @@
 		var vh = $(window).height();
 		var vw = $(window).width();
 		
-		var dynamicPercent = 10;
+		var dynamicPercent = 20;
 		
 		var resultW = parseInt(vh - (vh * (dynamicPercent / 100)));
 		var resultL = parseInt(vw - (vw / 2) - (resultW / 2));
@@ -216,7 +221,8 @@
 		if(((angleRaw % 90) < 10) || ((angleRaw % 90) > 80))
 		{
 			pointCounter++;
-			toggleAux();
+			axis = ((pointCounter % 2) == 0) ? "x" : "y";
+			toggleAux(axis);
 		}
 		tryCounter++;
 		$("#scoreBoardLeft").html(pointCounter);
@@ -267,8 +273,8 @@
 	{
 		var target = $("#aux_" + aux);
 		target.css("transform-origin", "center center");
-		target.css("transition-property", "top");
-    	target.css("transition-duration", "0.3s");
+		target.css("transition-property", "top, left");
+    	target.css("transition-duration", "0.25s, 0.25s");
 		switch(aux)
 		{
 			case 1:
@@ -293,19 +299,39 @@
 	}
 
 	var yToggleStatus = false;
-	function toggleAux()
+	var xToggleStatus = false;
+	function toggleAux(axis)
 	{
-		if(yToggleStatus)
+		if(axis == "y" || axis == "both")
 		{
-			$("#aux_1").css("top", "5%");
-			$("#aux_3").css("top", "95%");
-			yToggleStatus = false;
+			if(yToggleStatus)
+			{
+				$("#aux_1").css("top", "5%");
+				$("#aux_3").css("top", "95%");
+				yToggleStatus = false;
+			}
+			else
+			{
+				$("#aux_1").css("top", "95%");
+				$("#aux_3").css("top", "5%");
+				yToggleStatus = true;
+			}
 		}
-		else
+
+		if(axis == "x" || axis == "both")
 		{
-			$("#aux_1").css("top", "95%");
-			$("#aux_3").css("top", "5%");
-			yToggleStatus = true;
+			if(xToggleStatus)
+			{
+				$("#aux_2").css("left", "95%");
+				$("#aux_4").css("left", "0%");
+				xToggleStatus = false;
+			}
+			else
+			{
+				$("#aux_2").css("left", "0%");
+				$("#aux_4").css("left", "95%");
+				xToggleStatus = true;
+			}
 		}
 	}
 
