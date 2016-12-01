@@ -2,6 +2,7 @@
 <html>
 <head>
 	<title>Preyzone</title>
+	<meta name="viewport" content="width=device-width"> <!-- Tap delay -->
 	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.1.1.min.js"></script>
 	<script
 		src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
@@ -37,6 +38,10 @@
 </div>
 
 <style type="text/css">
+
+html {
+	touch-action: manipulation; /* Prevents 300~350ms native tap delay on mobile devices */
+}
 
 body {
 	background-color: #041A1B;
