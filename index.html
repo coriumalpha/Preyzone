@@ -105,7 +105,7 @@ body {
 	text-align: center;
 	height: 15%;
 	width: 40%;
-	background-color: #254345;
+	background-color: #092E30;
 	left: 30%;
 	position: absolute;
 	border-radius: 10%;
@@ -161,11 +161,30 @@ body {
 
 	rotationSpeed = ((rotationSpeed / 60) * 360); //degs per sec
 	acceleration = accelerationPr / 100; //coeficiente
+	refreshSpeed = 1000 / refreshSpeed;
+
 
 	$(function()
 		{
 			spawnSquares();
 			fontSize();
+			rotationEngine();
+			//For performance improvement on slower devices
+			switch(getParameterByName("speed"))
+			{
+				case "conservative":
+					refreshSpeed = 60;
+					alert("conservative speed set");
+					break;
+				case "slow":
+					refreshSpeed = 100;
+					alert("slow speed set");
+					break;
+				case "turtle":
+					refreshSpeed = 160;
+					alert("Andalusian speed set");
+					break;
+			}
 		});
 	$(window).resize(function()
 		{
@@ -268,7 +287,7 @@ body {
 		$("#scoreBoardRight").html(tryCounter - pointCounter);
 	}
 
-	setInterval(function()
+	function rotationEngine()
 	{
 		var initialAngle = angleRaw;
 		if(debug == true) { console.log("inAn " + initialAngle); }
@@ -277,21 +296,15 @@ body {
 		if(debug == true) { console.log("tpf " + triangularPhaseFactor); }
 		if(debug == true) { console.log("pf " + phaseFactor); }
 		//if(acceleration != 0) { phaseFactor = phaseFactor * (acceleration + 1); }
-
-		nativeIncreaseRatio = (rotationSpeed / refreshSpeed);
-		triangularIncreaseRatio = nativeIncreaseRatio * (1 + triangularPhaseFactor);
+		triangularIncreaseRatio = ((rotationSpeed * (1 + triangularPhaseFactor)) );
 		//angleRaw = (angleRaw * (1 + phaseFactor));
-		if(debug == true) { console.log("na " + nativeIncreaseRatio); }
-	
-
-		angleRaw = ((initialAngle + triangularIncreaseRatio) % 360);
+		angleRaw = ((initialAngle + (triangularIncreaseRatio / (1000 / refreshSpeed))) % 360);
 		if(debug == true) { console.log("fAraw " + angleRaw); }
     	var angle = parseInt(angleRaw);
     	if(debug == true) { console.log("angle " + angle); }
 	    setRotationPosition(angle);
-
-	},
-	(1000 / refreshSpeed));
+	    setTimeout(rotationEngine, refreshSpeed);
+	}
 
 	function setRotationPosition(angle)
 	{
@@ -384,6 +397,20 @@ body {
 				xToggleStatus = true;
 			}
 		}
+	}
+
+	function getParameterByName(name, url)
+	{
+	    if (!url)
+	    {
+	      url = window.location.href;
+	    }
+	    name = name.replace(/[\[\]]/g, "\\$&");
+	    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+	        results = regex.exec(url);
+	    if (!results) return null;
+	    if (!results[2]) return '';
+	    return decodeURIComponent(results[2].replace(/\+/g, " "));
 	}
 
 
