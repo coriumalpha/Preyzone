@@ -17,13 +17,11 @@
 		<div id="scoreBoard">
 			<div id="scoreBoardLeft">0</div>
 			<div id="scoreBoardRight">0</div>
-			<div id="initialTip">Press spacebar or Click scoreboard</div>
+			<div id="initialTip">[SPACEBAR] OR [CLICK]</div>
 		</div>
 
 		<div id="auxContainer">
-			<div id="aux_1" class="ratio1-1 aux" >
-				<div class="filler"></div>
-			</div>
+			<div id="aux_1"><canvas id="canvasCone" height="100" width="100"></canvas></div>
 			<div id="aux_2" class="ratio1-1 aux" >
 				<div class="filler"></div>
 			</div>
@@ -153,10 +151,22 @@ body {
 	margin-top: 45%;
 	color: #60979B;
 }
+
+#canvasCone{
+	display: block;
+}
+
+#aux_1 {
+	position: absolute;
+	display: inline-block;
+    vertical-align: top;
+    width: 100%;
+}
+
 </style>
 
 <script type="text/javascript">
-	var rotationSpeed = 15; //RPM with acceleration set to false
+	var rotationSpeed = 10; //RPM with acceleration set to false
 	var refreshSpeed = 35//RfrPS
 	var accelerationPr = 100; //% per Revolution
 	var debug = false; //may cause animation go slow
@@ -173,6 +183,7 @@ body {
 		{
 			spawnSquares();
 			fontSize();
+			draw();
 			rotationEngine();
 			//For performance improvement on slower devices
 			switch(getParameterByName("speed"))
@@ -219,6 +230,24 @@ body {
 	});
 
 	$("#scoreBoard").click(function(){ validateFire(); });
+
+	function draw(bgcolor) {
+		bgcolor = (bgcolor === undefined || bgcolor == null) ? "#73D11B" : bgcolor;
+	  	var canvas = document.getElementById('canvasCone');
+	  	$("#canvasCone").css("width", "15%");
+    	if (canvas.getContext){
+	    var ctx = canvas.getContext('2d');
+
+		ctx.beginPath();
+		ctx.moveTo(20,15);
+		ctx.lineTo(50,60);
+		ctx.lineTo(80,15)
+		ctx.arcTo(50,0,20,15,60);
+		ctx.fillStyle = bgcolor;
+		ctx.fill();
+	  }
+	}
+
 
 	function fontSize()
 	{
@@ -294,6 +323,7 @@ body {
 
 	function rotationEngine()
 	{
+		setTimeout(rotationEngine, refreshSpeed);
 		var initialAngle = angleRaw;
 		if(debug == true) { console.log("inAn " + initialAngle); }
 		phaseFactor = ((((initialAngle * 100) / 360) / 100)); //need +1 to realy be a factor
@@ -303,12 +333,11 @@ body {
 		//if(acceleration != 0) { phaseFactor = phaseFactor * (acceleration + 1); }
 		triangularIncreaseRatio = ((rotationSpeed * (1 + triangularPhaseFactor)) );
 		//angleRaw = (angleRaw * (1 + phaseFactor));
-		angleRaw = ((initialAngle + (triangularIncreaseRatio / (1000 / refreshSpeed))) % 360);
+		angleRaw = ((initialAngle + (triangularIncreaseRatio / (1000 / (refreshSpeed - 1)))) % 360);
 		if(debug == true) { console.log("fAraw " + angleRaw); }
     	var angle = parseInt(angleRaw);
     	if(debug == true) { console.log("angle " + angle); }
 	    setRotationPosition(angle);
-	    setTimeout(rotationEngine, refreshSpeed);
 	}
 
 	function setRotationPosition(angle)
@@ -336,19 +365,18 @@ body {
 		{
 			case 1:
 				target.css("top", "0%");
-    			target.css("left", "50%");
-    			target.css("background", "#73D11B");
+    			target.css("left", "42.5%");
 				break;
 			case 2:
-				target.css("top", "50%");
+				target.css("top", "47.5%");
     			target.css("left", "95%");
 				break;
 	    	case 3:
 				target.css("top", "95%");
-    			target.css("left", "50%");
+    			target.css("left", "47.5%");
 				break;
 	    	case 4:
-				target.css("top", "50%");
+				target.css("top", "47.5%");
     			target.css("left", "0%");
 				break;
 
@@ -357,13 +385,14 @@ body {
 
 	function updateColor(el, last)
 	{
-		if(last)
+		//Dissapointed with this method
+	    if(last)
 		{
-			$(el).css("background", "#73D11B");
+			draw("#73D11B");
 		}
 		else
 		{
-			$(el).css("background", "#8F1D1D");
+			draw("#8F1D1D");
 		}
 	}
 
@@ -375,14 +404,20 @@ body {
 		{
 			if(yToggleStatus)
 			{
-				$("#aux_1").css("top", "5%");
+				$("#aux_1").css("top", "0%");
+				$("#canvasCone").css("transform", "rotate(0deg)");
+				$("#canvasCone").css("-ms-transform", "rotate(0deg)");
+				$("#canvasCone").css("-webkit-transform", "rotate(0deg)");
 				$("#aux_3").css("top", "95%");
 				yToggleStatus = false;
 			}
 			else
 			{
-				$("#aux_1").css("top", "95%");
-				$("#aux_3").css("top", "5%");
+				$("#aux_1").css("top", "85%");
+				$("#canvasCone").css("transform", "rotate(180deg)");
+				$("#canvasCone").css("-ms-transform", "rotate(180deg)");
+				$("#canvasCone").css("-webkit-transform", "rotate(180deg)");
+				$("#aux_3").css("top", "0%");
 				yToggleStatus = true;
 			}
 		}
