@@ -21,7 +21,7 @@
 		</div>
 
 		<div id="auxContainer">
-			<div id="aux_1"><canvas id="canvasCone" height="100" width="100"></canvas></div>
+			<div id="aux_1"><canvas id="canvasCone" height="100" width="60"></canvas></div>
 			<div id="aux_2" class="ratio1-1 aux" >
 				<div class="filler"></div>
 			</div>
@@ -35,135 +35,6 @@
 	</div>
 </div>
 
-<style type="text/css">
-
-html {
-	touch-action: manipulation; /* Prevents 300~350ms native tap delay on mobile devices */
-}
-
-body {
-	background-color: #041A1B;
-}
-
-.mainContainer {
-	background: #254345;
-	position: absolute;
-	display: inline-block;
-	vertical-align: top;
-    box-shadow: 6px 6px 9px -1px rgba(0,0,0,0.6);
-    border-radius: 3.75%;
-}
-
-.tar {
-	width: 10%;
-	border-radius: 20%;
-    background: #04A2AE;
-    position: absolute;
-    display: inline-block;
-    vertical-align: top;
-    box-shadow: 0px 0px 18px 7px rgba(0,0,0,0.1);
-    z-index: 1;
-	cursor: pointer;
-}
-
-.aux {
-    width: 5%;
-    border-radius: 50%;
-    background: #37DCE7;
-    position: absolute;
-    display: inline-block;
-    vertical-align: top;
-    box-shadow: 0 0 4px rgba(0,0,0,.3);
-}
-
-
-.aux:before, .tar:before, #mainContainer:before{
-    content: '';
-    display: block;
-}
-.ratio1-1:before {padding-top: 100%;}
-
-.filler {    
-   position: absolute;
-   top: 0; left: 0; bottom: 0; right: 0;
-   font-size: 1.5rem;
-   color: #444;
-}
-
-.innerContainer{
-	margin: 2.5%;
-	position: absolute;
-   	top: 0; left: 0; bottom: 0; right: 0;
-   	font-size: 1.5rem;
-   	color: #444;
-}
-
-#auxContainer{
-	height: 100%;
-	width: 100%;
-	transform-origin: center center;
-}
-
-#scoreBoard{
-	text-align: center;
-	height: 15%;
-	width: 40%;
-	background-color: #092E30;
-	left: 30%;
-	position: absolute;
-	border-radius: 10%;
-	box-shadow: 0 0 4px rgba(0,0,0,.3);
-	transform-origin: center center;
-	top: 42.5%;
-	cursor: pointer;
-	z-index: 1;
-}
-
-#scoreBoardLeft{
-	height: 80%;
-	width: 45%;
-	top: 10%;
-	position: absolute;
-	background-color: #58B600;
-	color: #c0f2c0;
-	border-radius: 10%;
-	float: left;
-	left: 2.5%;
-	font-size: 2em;
-	line-height: 1.25em;
-}
-
-#scoreBoardRight{
-	height: 80%;
-	display: inline-block;
-	width: 45%;
-	top: 10%;
-	position: absolute;
-	background-color: #8F1D1D;
-	color: #E1A3A3;
-	border-radius: 10%;
-	margin-left: 2.5%;
-	font-size: 2em;
-	line-height: 1.25em;
-}
-
-#initialTip{
-	margin-top: 45%;
-	color: #60979B;
-}
-
-#canvasCone{
-	display: block;
-}
-
-#aux_1 {
-	position: absolute;
-	display: inline-block;
-    vertical-align: top;
-    width: 100%;
-}
-
-</style>
 
 <script type="text/javascript">
 	var rotationSpeed = 10; //RPM with acceleration set to false
@@ -229,20 +100,29 @@ body {
 		}
 	});
 
-	$("#scoreBoard").click(function(){ validateFire(); });
+	$("#scoreBoard").click(function(){
+		if(rotationEngineStatus == "running")
+		{
+			rotationEngineControl("stop");
+		}
+		else if(rotationEngineStatus == "stop")
+		{
+			rotationEngineControl("ruuuuuuuun!!!");
+		}
+	});
 
 	function draw(bgcolor) {
 		bgcolor = (bgcolor === undefined || bgcolor == null) ? "#73D11B" : bgcolor;
 	  	var canvas = document.getElementById('canvasCone');
-	  	$("#canvasCone").css("width", "15%");
+	  	$("#canvasCone").css("width", "10%");
     	if (canvas.getContext){
 	    var ctx = canvas.getContext('2d');
 
 		ctx.beginPath();
-		ctx.moveTo(20,15);
-		ctx.lineTo(50,60);
-		ctx.lineTo(80,15)
-		ctx.arcTo(50,0,20,15,60);
+		ctx.moveTo(0,15);
+		ctx.lineTo(30,60);
+		ctx.lineTo(60,15)
+		ctx.arcTo(30,0,0,15,60);
 		ctx.fillStyle = bgcolor;
 		ctx.fill();
 	  }
@@ -304,6 +184,14 @@ body {
 			updateColor("#aux_1", last);
 			axis = ((pointCounter % 2) == 0) ? "x" : "y";
 			axis = ((pointCounter % 3) == 0) ? "both" : axis;
+			axis = ((pointCounter % 5) == 0) ? "fw" : axis;
+			axis = (((pointCounter - 1) % 5) == 0) ? "fw" : axis;
+			axis = (pointCounter == 1) ? "both" : axis;
+
+			if(((pointCounter + 1) % 5) == 0)
+			{
+				$("#canvasCone").css("transform", "rotate(315deg)");
+			}
 			toggleAux(axis);
 		}
 		else
@@ -321,9 +209,12 @@ body {
 		$("#scoreBoardRight").html(tryCounter - pointCounter);
 	}
 
+	var rotationEngineTimeout;
+	var rotationEngineStatus;
 	function rotationEngine()
 	{
-		setTimeout(rotationEngine, refreshSpeed);
+		rotationEngineTimeout = setTimeout(rotationEngine, refreshSpeed);
+		rotationEngineStatus = "running";
 		var initialAngle = angleRaw;
 		if(debug == true) { console.log("inAn " + initialAngle); }
 		phaseFactor = ((((initialAngle * 100) / 360) / 100)); //need +1 to realy be a factor
@@ -338,6 +229,19 @@ body {
     	var angle = parseInt(angleRaw);
     	if(debug == true) { console.log("angle " + angle); }
 	    setRotationPosition(angle);
+	}
+
+	function rotationEngineControl(control)
+	{
+		if(control == "stop")
+		{
+			clearTimeout(rotationEngineTimeout);
+		}
+		else
+		{
+			rotationEngineTimeout = setTimeout(rotationEngine, refreshSpeed);
+		}
+		rotationEngineStatus = control;
 	}
 
 	function setRotationPosition(angle)
@@ -365,7 +269,7 @@ body {
 		{
 			case 1:
 				target.css("top", "0%");
-    			target.css("left", "42.5%");
+    			target.css("left", "45%");
 				break;
 			case 2:
 				target.css("top", "47.5%");
@@ -398,6 +302,7 @@ body {
 
 	var yToggleStatus = false;
 	var xToggleStatus = false;
+	var fwToggleStatus = false;
 	function toggleAux(axis)
 	{
 		if(axis == "y" || axis == "both")
@@ -437,6 +342,28 @@ body {
 				xToggleStatus = true;
 			}
 		}
+
+		if(axis == "fw")
+		{
+			if(fwToggleStatus)
+			{
+				$("#aux_1").css("top", "0%");
+				$("#aux_1").css("left", "45%");
+				$("#aux_2").css("top", "47.5%");
+				$("#aux_2").css("left", "95%");
+				$("#canvasCone").css("transform", "rotate(0deg)");
+				fwToggleStatus = false;
+			}
+			else
+			{
+				$("#aux_1").css("left", "90%");
+				$("#aux_1").css("top", "42.5%");
+				$("#aux_2").css("left", "47.5%");
+				$("#aux_2").css("top", "0%");
+				$("#canvasCone").css("transform", "rotate(135deg)");
+				fwToggleStatus = true;
+			}
+		}
 	}
 
 	function getParameterByName(name, url)
@@ -455,6 +382,136 @@ body {
 
 
 </script>
+
+<style type="text/css">
+
+	html {
+		touch-action: manipulation; /* Prevents 300~350ms native tap delay on mobile devices */
+	}
+
+	body {
+		background-color: #041A1B;
+	}
+
+	.mainContainer {
+		background: #254345;
+		position: absolute;
+		display: inline-block;
+		vertical-align: top;
+	    box-shadow: 6px 6px 9px -1px rgba(0,0,0,0.6);
+	    border-radius: 3.75%;
+	}
+
+	.tar {
+		width: 10%;
+		border-radius: 20%;
+	    background: #04A2AE;
+	    position: absolute;
+	    display: inline-block;
+	    vertical-align: top;
+	    box-shadow: 0px 0px 18px 7px rgba(0,0,0,0.1);
+	    z-index: 1;
+		cursor: pointer;
+	}
+
+	.aux {
+	    width: 5%;
+	    border-radius: 50%;
+	    background: #37DCE7;
+	    position: absolute;
+	    display: inline-block;
+	    vertical-align: top;
+	    box-shadow: 0 0 4px rgba(0,0,0,.3);
+	}
+
+
+	.aux:before, .tar:before, #mainContainer:before{
+	    content: '';
+	    display: block;
+	}
+	.ratio1-1:before {padding-top: 100%;}
+
+	.filler {    
+	   position: absolute;
+	   top: 0; left: 0; bottom: 0; right: 0;
+	   font-size: 1.5rem;
+	   color: #444;
+	}
+
+	.innerContainer{
+		margin: 2.5%;
+		position: absolute;
+	   	top: 0; left: 0; bottom: 0; right: 0;
+	   	font-size: 1.5rem;
+	   	color: #444;
+	}
+
+	#auxContainer{
+		height: 100%;
+		width: 100%;
+		transform-origin: center center;
+	}
+
+	#scoreBoard{
+		text-align: center;
+		height: 15%;
+		width: 40%;
+		background-color: #092E30;
+		left: 30%;
+		position: absolute;
+		border-radius: 10%;
+		box-shadow: 0 0 4px rgba(0,0,0,.3);
+		transform-origin: center center;
+		top: 42.5%;
+		cursor: pointer;
+		z-index: 1;
+	}
+
+	#scoreBoardLeft{
+		height: 80%;
+		width: 45%;
+		top: 10%;
+		position: absolute;
+		background-color: #58B600;
+		color: #c0f2c0;
+		border-radius: 10%;
+		float: left;
+		left: 2.5%;
+		font-size: 2em;
+		line-height: 1.25em;
+	}
+
+	#scoreBoardRight{
+		height: 80%;
+		display: inline-block;
+		width: 45%;
+		top: 10%;
+		position: absolute;
+		background-color: #8F1D1D;
+		color: #E1A3A3;
+		border-radius: 10%;
+		margin-left: 2.5%;
+		font-size: 2em;
+		line-height: 1.25em;
+	}
+
+	#initialTip{
+		margin-top: 45%;
+		color: #60979B;
+	}
+
+	#canvasCone{
+		display: block;
+	}
+
+	#aux_1 {
+		position: absolute;
+		display: inline-block;
+	    vertical-align: top;
+	    width: 100%;
+	}
+
+</style>
 
 </body>
 </html>
