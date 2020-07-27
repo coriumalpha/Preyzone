@@ -2,6 +2,7 @@
 
 ## HTML5 simple game
 
+### Unmaintained project
 
 ***
 
